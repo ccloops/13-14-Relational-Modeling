@@ -15,17 +15,17 @@ In this project, I built a RESTful (Hypertext Transfer Protocol) HTTP server usi
 
 The server module is creating an http server, defining server-on behavior and exporting an interface for starting and stopping the server. The server module exports an object containing start and stop methods.
 
-The server module requires in express, mongoose, logger and the book-router.js file. The server.start and stop methods return a new Promise with resolve and reject parameters. The start method contains an app.listen function that listens for the server start. The server.stop method has an httpServer.close function that turns the server off by setting the isServerOn variable to false.
+The server module requires in express, mongoose, logger and the forest-router.js file. The server.start and stop methods return a new Promise with resolve and reject parameters. The start method contains an app.listen function that listens for the server start. The server.stop method has an httpServer.close function that turns the server off by setting the isServerOn variable to false.
 
 #### Route Module
 
-##### `book-router.js`
+##### `forest-router.js`
 
-book-router.js requires in the Router object from express, the jsonParser, http-errors, the logger module  and book.js. Inside the module, there are functions declared for bookRouter.post, bookRouter.get, bookRouter.delete, and bookRouter.put. These methods each handle their corresponding method and send the appropriate response based on the input. The bookRouter is exporting a new Router instance.
+forest-router.js requires in the Router object from express, the jsonParser, http-errors, the logger module  and forest.js. Inside the module, there are functions declared for forestRouter.post, forestRouter.get, forestRouter.delete, and forestRouter.put. These methods each handle their corresponding method and send the appropriate response based on the input. The forestRouter is exporting a new Router instance.
 
 #### Model Module
 
-The model module contains a book.js file that requires in mongoose and has a bookSchema with the properties: title, author, genre, content, and timestamp. The mongoose.model is being exported from this file.
+The model module contains a forest.js file that requires in mongoose and has a forestSchema with the properties: name, location, type, description, and timestamp. The mongoose.model is being exported from this file.
 #### Test Module
 
 server.test.js contains tests for POST, GET, DELETE and PUT methods.
