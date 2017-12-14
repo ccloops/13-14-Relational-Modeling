@@ -20,19 +20,6 @@ forestRouter.post('/api/forests', jsonParser, (request, response, next) => {
     .catch(next);
 });
 
-forestRouter.get('/api/forests', (request, response) => {
-
-  return Forest.find({}, (error, forests) => {
-    let forestMap = [];
-
-    forests.forEach(forest => {
-      forestMap.push(forest);
-    });
-
-    return response.json(forestMap);
-  });
-});
-
 forestRouter.get('/api/forests/:id', (request, response, next) => {
 
   return Forest.findById(request.params.id)
@@ -43,6 +30,41 @@ forestRouter.get('/api/forests/:id', (request, response, next) => {
       logger.log('info', 'GET - Returning a 200 status code');
       return response.json(forest);
     }).catch(next);
+});
+
+forestRouter.get('/api/forests', (request, response, next) => {
+  const PAGE_SIZE = 10;
+  let {page = '0'} = request.query;
+  page = Number(page);
+  
+  if(isNaN(page)) 
+    page = 0;
+  
+  page = page < 0 ? 0 : page;
+  
+  let allForests = null;
+  
+  return Forest.find({})
+    .skip(page * PAGE_SIZE)
+    .limit(PAGE_SIZE)
+    .then(forests => {
+      allForests = forests;
+      return Forest.find({}).count();
+    })
+    .then(forestCount => {
+      let responseData = {
+        count : forestCount,
+        data: allForests,
+      };
+      let lastPage = Math.floor(forestCount / PAGE_SIZE);
+      response.links({
+        next: `http://localhost:${process.env.PORT}/api/forests?page=${page === lastPage ? lastPage : page + 1}`,
+        prev: `http://localhost:${process.env.PORT}/api/forests?page=${page < 1 ? 0 : page - 1}`,
+        last: `http://localhost:${process.env.PORT}/api/forests?page=${lastPage}`,
+      });
+  
+      response.json(responseData);
+    });
 });
 
 forestRouter.delete('/api/forests/:id', (request, response, next) => {

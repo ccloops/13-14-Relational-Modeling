@@ -21,7 +21,7 @@ The server module requires in express, mongoose, logger and the forest-router.js
 
 ##### `forest-router.js`
 
-forest-router.js requires in the Router object from express, the jsonParser, http-errors, the logger module  and forest.js. Inside the module, there are functions declared for forestRouter.post, forestRouter.get, forestRouter.delete, and forestRouter.put. These methods each handle their corresponding method and send the appropriate response based on the input. The forestRouter is exporting a new Router instance.
+forest-router.js requires in the Router object from express, the jsonParser, http-errors, the logger module  and forest.js. Inside the module, there are functions declared for forestRouter.post, forestRouter.get, forestRouter.delete, and forestRouter.put. These methods each handle their corresponding method and send the appropriate response based on the input. The forestRouter is exporting a new Router instance. Additionally, I set up a get all forests route with pagination that returns an array of forests.
 
 #### Model Module
 
@@ -46,6 +46,8 @@ server.test.js contains tests for `POST`, `GET`, `DELETE` and `PUT` methods.
   * `400` - if an incomplete put request is sent
   * `404` - if id is invalid 
   * `409` - if keys are unique
+
+*** Additionally - I created and tested a GET route with pagination for returning an array of forests ***
 
 #### Middleware
 

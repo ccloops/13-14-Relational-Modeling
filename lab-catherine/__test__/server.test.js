@@ -21,6 +21,12 @@ const forestMockCreate = () => {
   }).save();
 };
 
+const forestMockCreateMany = (howMany) => {
+  return Promise.all(new Array(howMany)
+    .fill(0)
+    .map(() => forestMockCreate()));
+};
+
 describe('/api/forests', () => {
   beforeAll(server.start);
   afterAll(server.stop);
@@ -81,7 +87,7 @@ describe('/api/forests', () => {
     });
   });
 
-  describe('GET /api/forests', () => {
+  describe('GET /api/forests/:id', () => {
     test('GET should respond with 200 status code if there is a valid forest id and no errors', () => {
       let forestToTest = null;
 
@@ -102,23 +108,26 @@ describe('/api/forests', () => {
           expect(response.body.description).toEqual(forestToTest.description);
         });    
     });
-
-    test('GET should respond with an array of all forest objects if get request is made with out an id', () => {
-      return forestMockCreate()
-        .then(() => forestMockCreate())
-        .then(() => forestMockCreate())
-        .then(() => superagent.get(`${apiURL}`))
-        .then(response => {
-          expect(response.status).toEqual(200);
-          expect(response.body.length).toEqual(3);
-        });
-    });
     
     test('GET should respond with 404 status code if the id is incorrect', () => {
       return superagent.get(`${apiURL}/mooshy`)
         .then(Promise.reject)
         .catch(response => {
           expect(response.status).toEqual(404);
+        });
+    });
+  });
+
+  describe('GET /api/forests/', () => {
+    test('should return 10 forests (where 10 is the size of the page by default)', () => {
+      return forestMockCreateMany(100)
+        .then(() => {
+          return superagent.get(`${apiURL}`);
+        })
+        .then(response => {
+          expect(response.status).toEqual(200);
+          expect(response.body.count).toEqual(100);
+          expect(response.body.data.length).toEqual(10);        
         });
     });
   });
