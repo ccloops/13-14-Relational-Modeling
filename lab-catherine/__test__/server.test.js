@@ -49,7 +49,7 @@ describe('/api/forests', () => {
         .catch(error => logger.log('error', error));
     });
 
-    test('should respond with a 400 code if we send an incomplete forest', () => {
+    test('should respond with a 400 status code if we send an incomplete forest', () => {
       let forestToPost = {
         description : faker.lorem.words(100),
       };
@@ -61,6 +61,24 @@ describe('/api/forests', () => {
         });
     });
 
+    test('should respond with a 409 status code if a key is unique', () => {
+      let forestToPost = {
+        name : faker.lorem.words(4),
+        location : faker.lorem.words(1),
+        type: 'Rain Forest',
+        description : faker.lorem.words(100),
+      };
+      return superagent.post(`${apiURL}`)
+        .send(forestToPost)
+        .then(() => { 
+          return superagent.post(`${apiURL}`)
+            .send(forestToPost);
+        })
+        .then(Promise.reject)
+        .catch(response => {
+          expect(response.status).toEqual(409);
+        });
+    });
   });
 
   describe('GET /api/forests', () => {
