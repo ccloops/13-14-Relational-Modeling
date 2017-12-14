@@ -178,5 +178,13 @@ describe('/api/forests', () => {
           expect(response.status).toEqual(400);
         });
     });
+
+    test('should return a 404 status code if id is invalid', () => {
+      return forestMockCreate()
+        .then(() => superagent.put(`${apiURL}/invalidId`))
+        .catch(response => {
+          expect(response.status).toEqual(404);
+        });
+    });
   });
 });
