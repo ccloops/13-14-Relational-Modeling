@@ -28,7 +28,24 @@ forest-router.js requires in the Router object from express, the jsonParser, htt
 The model module contains a forest.js file that requires in mongoose and has a forestSchema with the properties: name, location, type, description, and timestamp. The mongoose.model is being exported from this file.
 #### Test Module
 
-server.test.js contains tests for POST, GET, DELETE and PUT methods.
+server.test.js contains tests for `POST`, `GET`, `DELETE` and `PUT` methods.
+
+* `POST` - tests for status codes: 
+  * `200` - successful post request
+  * `400` - if an incomplete post request is sent
+  * `409` - if keys are unique
+* `GET` - tests for status codes: 
+  * `200` - successful get request 
+  * `404` - if id is invalid
+* `DELETE` - tests for status codes: 
+  * `204` - successful delete request
+  * `404` - if id is invalid
+  * `400` - if an incomplete delete request is sent
+* `PUT` - tests for status codes: 
+  * `200` - successful update request
+  * `400` - if an incomplete put request is sent
+  * `404` - if id is invalid 
+  * `409` - if keys are unique
 
 #### Middleware
 

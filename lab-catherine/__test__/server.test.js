@@ -186,5 +186,37 @@ describe('/api/forests', () => {
           expect(response.status).toEqual(404);
         });
     });
+
+
+    test('should respond with a 409 status code if a key is unique', () => {
+      let forestToPostOne = {
+        name : 'Evergreen Forest',
+        location : faker.lorem.words(1),
+        type: 'Rain Forest',
+        description : faker.lorem.words(100),
+      };
+
+      let forestToPostTwo = {
+        name : faker.lorem.words(4),
+        location : faker.lorem.words(1),
+        type: 'Rain Forest',
+        description : faker.lorem.words(100),
+      };
+
+      return superagent.post(`${apiURL}`)
+        .send(forestToPostOne)
+        .then(() => { 
+          return superagent.post(`${apiURL}`)
+            .send(forestToPostTwo);
+        })
+        .then(response => {
+          return superagent.put(`${apiURL}/${response.body._id}`)
+            .send({name: 'Evergreen Forest'});
+        })
+        .then(Promise.reject)
+        .catch(response => {
+          expect(response.status).toEqual(409);
+        });
+    });
   });
 });
