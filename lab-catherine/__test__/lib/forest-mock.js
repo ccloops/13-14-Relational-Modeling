@@ -35,9 +35,11 @@ forestMock.createMany = (howMany) => {
         .fill(0)
         .map(() => {
           return new Forest({
-            title: faker.lorem.words(7),
-            content: faker.lorem.words(100),
-            continent: continent._id,
+            name: faker.lorem.words(4),
+            location: faker.lorem.words(1),
+            type: 'Rain Forest',
+            description: faker.lorem.words(100),
+            continent: continent._id, 
           }).save();
         }));
     })
