@@ -1,13 +1,13 @@
 # Code Fellows: Seattle 401 JavaScript - 401d19
 
-##  Lab 13 Express and Mongo two resource RESTful API
+##  Lab 13 && 14 Express and Mongo two resource RESTful API
 
 ### Author:
  Catherine Looper
 
 ### Motivation
 
-In this project, I built a RESTful (Hypertext Transfer Protocol) HTTP server using Express. This server handles GET, POST, PUT and DELETE requests/responses. This API uses MongoDB and Mongoose to write data to a db directory for persistence.
+In this project, I built a RESTful (Hypertext Transfer Protocol) HTTP server using Express. This server handles GET, POST, PUT and DELETE requests/responses. This API uses MongoDB and Mongoose to write data to a db directory for persistence. The database is based on a "one-to-many" relationship where there are many forests and each forest has only one corresponding continent.
 
 ### Build
 
@@ -15,20 +15,26 @@ In this project, I built a RESTful (Hypertext Transfer Protocol) HTTP server usi
 
 The server module is creating an http server, defining server-on behavior and exporting an interface for starting and stopping the server. The server module exports an object containing start and stop methods.
 
-The server module requires in express, mongoose, logger and the forest-router.js file. The server.start and stop methods return a new Promise with resolve and reject parameters. The start method contains an app.listen function that listens for the server start. The server.stop method has an httpServer.close function that turns the server off by setting the isServerOn variable to false.
+The server module requires in express, mongoose, logger, logger-middleware, continent-router and the forest-router.js file. The server.start and stop methods return a new Promise with resolve and reject parameters. The start method contains an app.listen function that listens for the server start. The server.stop method has an httpServer.close function that turns the server off by setting the isServerOn variable to false.
 
 #### Route Module
 
 ##### `forest-router.js`
 
-forest-router.js requires in the Router object from express, the jsonParser, http-errors, the logger module  and forest.js. Inside the module, there are functions declared for forestRouter.post, forestRouter.get, forestRouter.delete, and forestRouter.put. These methods each handle their corresponding method and send the appropriate response based on the input. The forestRouter is exporting a new Router instance. Additionally, I set up a get all forests route with pagination that returns an array of forests.
+forest-router.js requires in the Router object from express, the jsonParser, http-errors, the logger module  and forest.js. Inside the module, there are functions declared for forestRouter.post, forestRouter.get, forestRouter.delete, and forestRouter.put. These methods each handle their corresponding method and send the appropriate response based on the input. The forestRouter is exporting a new Router instance. Additionally, I set up a get all forests route with pagination that returns an array of forests. This app has been refactored to reflect a one to many relationship where forests are many and continents are one.
+
+##### `continent-router.js` 
+
+continent-router.js requires in the Router object from express, the jsonParser, http-errors, and continent.js. Inside the module, there are functions declared for continentRouter.post, continentRouter.get, continentRouter.delete, and continentRouter.put. These methods each handle their corresponding method and send the appropriate response based on the input. The continentRouter is exporting a new Router instance. The continent router represents the one in the 'one to many' relationship.
 
 #### Model Module
 
-The model module contains a forest.js file that requires in mongoose and has a forestSchema with the properties: name, location, type, description, and timestamp. The mongoose.model is being exported from this file.
+The model module contains a `forest.js` file that requires in mongoose and has a forestSchema with the properties: name, location, type, description, and timestamp. The mongoose.model is being exported from this file. The model module also contains a `continent.js` file that requires in mongoose and has a continentSchema with the properties: name, size, population, keywords, and forests.
 #### Test Module
 
-server.test.js contains tests for `POST`, `GET`, `DELETE` and `PUT` methods.
+Contains a `lib/` directory with the files: `setup.js`, `continent-mock.js` and `forest-mock.js`. These files assist in the tests by setting up the environment variables and mock objects to test.
+
+continent-router.test.js and forest-router.test.js contain tests for `POST`, `GET`, `DELETE` and `PUT` methods.
 
 * `POST` - tests for status codes: 
   * `200` - successful post request
