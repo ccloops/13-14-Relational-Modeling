@@ -1,61 +1,67 @@
 'use strict';
 
-process.env.PORT = 3000;
-
-process.env.MONGODB_URI = 'mongodb://localhost/testing';
+require('./lib/setup');
 
 const faker = require('faker');
 const superagent = require('superagent');
-const Forest = require('../model/forest');
+// const Forest = require('../model/forest');
 const server = require('../lib/server');
-const logger = require('../lib/logger');
+// const logger = require('../lib/logger');
+
+const forestMock = require('./lib/forest-mock');
+const continentMock = require('./lib/continent-mock');
 
 const apiURL = `http://localhost:${process.env.PORT}/api/forests`;
-
-const forestMockCreate = () => {
-  return new Forest({
-    name : faker.lorem.words(4),
-    location : faker.lorem.words(1),
-    type: 'Rain Forest',
-    description : faker.lorem.words(100),
-  }).save();
-};
-
-const forestMockCreateMany = (howMany) => {
-  return Promise.all(new Array(howMany)
-    .fill(0)
-    .map(() => forestMockCreate()));
-};
 
 describe('/api/forests', () => {
   beforeAll(server.start);
   afterAll(server.stop);
-  afterEach(() => Forest.remove({}));
+  afterEach(forestMock.remove);
 
   describe('POST /api/forests', () => {
     test('should respond with a forest and 200 status code if there are no errors', () => {
-      let forestToPost = {
-        name : faker.lorem.words(4),
-        location : faker.lorem.words(1),
-        type: 'Rain Forest',
-        description : faker.lorem.words(100),
-      };
-      return superagent.post(`${apiURL}`)
-        .send(forestToPost)
-        .then(response => {
-          expect(response.status).toEqual(200);
-          expect(response.body._id).toBeTruthy();
-          expect(response.body.timestamp).toBeTruthy();
+      let tempContinentMock = null;
+      return continentMock.create()
+        .then(mock => {
+          tempContinentMock = mock;
+      
+          let forestToPost = {
+            name : faker.lorem.words(4),
+            location : faker.lorem.words(1),
+            type: 'Rain Forest',
+            description : faker.lorem.words(100),
+            continent: mock._id,
+          };
+          return superagent.post(`${apiURL}`)
+            .send(forestToPost)
+            .then(response => {
+              expect(response.status).toEqual(200);
+              expect(response.body._id).toBeTruthy();
+              expect(response.body.timestamp).toBeTruthy();
+              expect(response.body.continent).toEqual(tempContinentMock._id.toString());          
 
-          expect(response.body.name).toEqual(forestToPost.name);
-          expect(response.body.location).toEqual(forestToPost.location);
-          expect(response.body.type).toEqual(forestToPost.type);          
-          expect(response.body.description).toEqual(forestToPost.description);
-        })
-        .catch(error => logger.log('error', error));
+              expect(response.body.name).toEqual(forestToPost.name);
+              expect(response.body.location).toEqual(forestToPost.location);
+              expect(response.body.type).toEqual(forestToPost.type);          
+              expect(response.body.description).toEqual(forestToPost.description);
+            });
+        });
     });
 
-    test('should respond with a 400 status code if we send an incomplete forest', () => {
+    // test.only('should respond with a 404 if the continent id is not present', () => {
+    //   return superagent.post(apiURL)
+    //     .send({
+    //       name: 'Evergreen Forest',
+    //       description: faker.lorem.words(100),
+    //       continent: 'BAD_ID',
+    //     })
+    //     .then(Promise.reject)
+    //     .catch(response => {
+    //       expect(response.status).toEqual(404);
+    //     });
+    // });
+
+    test.only('should respond with a 400 status code if we send an incomplete forest', () => {
       let forestToPost = {
         description : faker.lorem.words(100),
       };
@@ -91,10 +97,10 @@ describe('/api/forests', () => {
     test('GET should respond with 200 status code if there is a valid forest id and no errors', () => {
       let forestToTest = null;
 
-      return forestMockCreate()
-        .then(forest => {
-          forestToTest = forest;
-          return superagent.get(`${apiURL}/${forest._id}`);
+      return forestMock.create()
+        .then(mock => {
+          forestToTest = mock.forest;
+          return superagent.get(`${apiURL}/${mock.forest._id}`);
         })
         .then(response => {
           expect(response.status).toEqual(200);
@@ -106,6 +112,10 @@ describe('/api/forests', () => {
           expect(response.body.location).toEqual(forestToTest.location);
           expect(response.body.type).toEqual(forestToTest.type);          
           expect(response.body.description).toEqual(forestToTest.description);
+        
+          expect(response.body.continent._id).toEqual(forestToTest.continent._id.toString());
+          expect(response.body.continent.name).toEqual(forestToTest.continent.name);
+          expect(JSON.stringify(response.body.continent.keywords)).toEqual(JSON.stringify(forestToTest.continent.keywords));
         });    
     });
     
@@ -120,7 +130,7 @@ describe('/api/forests', () => {
 
   describe('GET /api/forests/', () => {
     test('should return 10 forests (where 10 is the size of the page by default)', () => {
-      return forestMockCreateMany(100)
+      return forestMock.createMany(100)
         .then(() => {
           return superagent.get(`${apiURL}`);
         })
@@ -134,9 +144,9 @@ describe('/api/forests', () => {
 
   describe('DELETE /api/forests/:id', () => {
     test('DELETE should respond with 204 status code with no content in the body if successfully deleted', () => {
-      return forestMockCreate()
-        .then(forest => {
-          return superagent.delete(`${apiURL}/${forest._id}`)
+      return forestMock.create()
+        .then(mock => {
+          return superagent.delete(`${apiURL}/${mock.forest._id}`)
             .then(response => {
               expect(response.status).toEqual(204);
             });
@@ -165,10 +175,10 @@ describe('/api/forests', () => {
       
       let forestToUpdate = null;
       
-      return forestMockCreate()
-        .then(forest => {
-          forestToUpdate = forest;
-          return superagent.put(`${apiURL}/${forest._id}`)
+      return forestMock.create()
+        .then(mock => {
+          forestToUpdate = mock;
+          return superagent.put(`${apiURL}/${mock.forest._id}`)
             .send({name: 'Evergreen Forest'});
         }).then(response => { 
           expect(response.status).toEqual(200);
@@ -181,7 +191,7 @@ describe('/api/forests', () => {
     });
     
     test('should return a 400 status code if invalid PUT request', () => {
-      return forestMockCreate()
+      return forestMock.create()
         .then(forest => superagent.put(`${apiURL}/${forest._id}`))
         .catch(response => {
           expect(response.status).toEqual(400);
