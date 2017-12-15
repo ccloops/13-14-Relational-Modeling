@@ -23,6 +23,7 @@ forestRouter.post('/api/forests', jsonParser, (request, response, next) => {
 forestRouter.get('/api/forests/:id', (request, response, next) => {
 
   return Forest.findById(request.params.id)
+    .populate('continent')
     .then(forest => {
       if(!forest){
         throw httpErrors(404, 'forest not found');
