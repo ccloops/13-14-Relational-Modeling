@@ -72,25 +72,6 @@ describe('/api/forests', () => {
           expect(response.status).toEqual(400);
         });
     });
-
-    // test.only('should respond with a 409 status code if a key is unique', () => {
-    //   let forestToPost = {
-    //     name : faker.lorem.words(4),
-    //     location : faker.lorem.words(1),
-    //     type: 'Rain Forest',
-    //     description : faker.lorem.words(100),
-    //   };
-    //   return superagent.post(`${apiURL}`)
-    //     .send(forestToPost)
-    //     .then(() => { 
-    //       return superagent.post(`${apiURL}`)
-    //         .send(forestToPost);
-    //     })
-    //     .then(Promise.reject)
-    //     .catch(response => {
-    //       expect(response.status).toEqual(409);
-    //     });
-    // });
   });
 
   describe('GET /api/forests/:id', () => {
@@ -190,14 +171,6 @@ describe('/api/forests', () => {
         });
     });
     
-    // test.only('should return a 400 status code if invalid PUT request', () => {
-    //   return forestMock.create()
-    //     .then(forest => superagent.put(`${apiURL}/${forest._id}`))
-    //     .catch(response => {
-    //       expect(response.status).toEqual(400);
-    //     });
-    // });
-
     test('should return a 404 status code if id is invalid', () => {
       return forestMock.create()
         .then(() => superagent.put(`${apiURL}/invalidId`))
@@ -205,39 +178,5 @@ describe('/api/forests', () => {
           expect(response.status).toEqual(404);
         });
     });
-
-
-    // test.only('should respond with a 409 status code if a key is unique', () => {
-    //   let forestToPostOne = {
-    //     name : 'Evergreen Forest',
-    //     location : faker.lorem.words(1),
-    //     type: 'Rain Forest',
-    //     description : faker.lorem.words(100),
-    //     continent: mock._id,
-    //   };
-
-    //   let forestToPostTwo = {
-    //     name : faker.lorem.words(4),
-    //     location : faker.lorem.words(1),
-    //     type: 'Rain Forest',
-    //     description : faker.lorem.words(100),
-    //     continent: mock._id,
-    //   };
-
-    //   return superagent.post(`${apiURL}`)
-    //     .send(forestToPostOne)
-    //     .then(() => { 
-    //       return superagent.post(`${apiURL}`)
-    //         .send(forestToPostTwo);
-    //     })
-    //     .then(response => {
-    //       return superagent.put(`${apiURL}/${response.body._id}`)
-    //         .send({name: 'Evergreen Forest'});
-    //     })
-    //     .then(Promise.reject)
-    //     .catch(response => {
-    //       expect(response.status).toEqual(409);
-    //     });
-    // });
   });
 });
